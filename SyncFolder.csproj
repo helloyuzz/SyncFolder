@@ -92,7 +92,10 @@
   <ItemGroup>
     <Content Include="Resources\SyncFolderCommand.png" />
     <Content Include="Resources\SyncFolderVSPackage.ico" />
-    <Content Include="SyncFolder.png" />
+    <Content Include="SyncFolder.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <VSCTCompile Include="SyncFolderPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>

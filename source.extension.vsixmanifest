@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="SyncFolder.2b82d3e9-de91-48ae-abab-506990d251f3" Version="1.0.0" Language="en-US" Publisher="wgrib2.com" />
+        <Identity Id="SyncFolder.2b82d3e9-de91-48ae-abab-506990d251f3" Version="1.0.1" Language="en-US" Publisher="wgrib2.com" />
         <DisplayName>SyncFolder</DisplayName>
         <Description xml:space="preserve">Sync Active Docuement To Solution Explorer</Description>
+        <PreviewImage>SyncFolder.png</PreviewImage>
     </Metadata>
     <Installation AllUsers="true">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
