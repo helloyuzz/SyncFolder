@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("wgrib2.com")]
 [assembly: AssemblyProduct("SyncFolder")]
 [assembly: AssemblyCopyright("yudz@wgrib2.com")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("wgrib2.com")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
