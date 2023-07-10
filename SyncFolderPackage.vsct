@@ -14,6 +14,7 @@
 			<Button guid="guidSyncFolderPackageCmdSet" id="SyncFolderCommandId" priority="0x0100" type="Button">
 				<Parent guid="guidSyncFolderPackageCmdSet" id="MyMenuGroup" />
 				<Icon guid="guidImages" id="bmpPic1" />
+				<CommandFlag>TextChanges</CommandFlag>
 				<Strings>
 					<ButtonText>SyncFolder</ButtonText>
 					<ToolTipText>同步文件夹</ToolTipText>

@@ -33,6 +33,16 @@ namespace SyncFolder {
         /// VS Package that provides this command, not null.
         /// </summary>
         private readonly AsyncPackage package;
+        EnvDTE80.DTE2 _dte = null;
+        private EnvDTE80.DTE2 dte {
+            get {
+                if(_dte == null) {
+                    var svc = package as System.IServiceProvider;
+                    _dte = svc.GetService(typeof(DTE)) as EnvDTE80.DTE2;
+                }
+                return _dte;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncFolderCommand"/> class.
@@ -45,8 +55,39 @@ namespace SyncFolder {
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
             var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            //var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+
+            menuItem.BeforeQueryStatus += new EventHandler(OnBeforeQueryStatus);
             commandService.AddCommand(menuItem);
+        }
+        //private ChangeMenuText(AsyncPackage package, OleMenuCommandService commandService) {
+        //    this.package = package ?? throw new ArgumentNullException(nameof(package));
+        //    commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+
+        //    var menuCommandID = new CommandID(CommandSet, CommandId);
+        //    var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+        //    menuItem.BeforeQueryStatus += new EventHandler(OnBeforeQueryStatus);
+        //    commandService.AddCommand(menuItem);
+        //}
+        private string cmdText = "";
+        private string defaultCmdText = "Open Solution File On Solution Explorer.";
+        private void OnBeforeQueryStatus(object sender, EventArgs e) {
+            var myCommand = sender as OleMenuCommand;
+            if (null != myCommand) {
+                if (dte.ActiveDocument != null) {
+                    if (cmdText.Equals(dte.ActiveDocument.FullName)) {
+                        return;
+                    }
+                    myCommand.Text = dte.ActiveDocument.FullName;
+                } else {
+                    if(myCommand.Text.Equals(defaultCmdText)) {
+                        return;
+                    }
+                    myCommand.Text = defaultCmdText;
+                }
+                cmdText = myCommand.Text;
+            }
         }
         /// <summary>
         /// Gets the instance of the command.
@@ -76,9 +117,6 @@ namespace SyncFolder {
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new SyncFolderCommand(package, commandService);
-
-
-
         }
 
         /// <summary>
@@ -92,11 +130,50 @@ namespace SyncFolder {
             ThreadHelper.ThrowIfNotOnUIThread();
             string message = "";
             string title = "SyncFolder";
-
+  
             try {
-                var item = package as System.IServiceProvider;
-                EnvDTE80.DTE2 dte = item.GetService(typeof(DTE)) as EnvDTE80.DTE2;
+                var svc = package as System.IServiceProvider;
+                EnvDTE80.DTE2 dte = svc.GetService(typeof(DTE)) as EnvDTE80.DTE2;
                 dte.ExecuteCommand("SolutionExplorer.SyncWithActiveDocument");
+
+                //var menuCommandID = new CommandID(CommandSet, CommandId);
+                //var cmd = svc.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+                //var menu = cmd.FindCommand(menuCommandID);
+
+
+                IVsStatusbar statusBar = (IVsStatusbar)svc.GetService(typeof(SVsStatusbar));
+
+                // Make sure the status bar is not frozen
+                int frozen;
+
+                statusBar.IsFrozen(out frozen);
+
+                if (frozen != 0) {
+                    statusBar.FreezeOutput(0);
+                }
+
+                var fullPath = "";
+                if (dte.ActiveDocument != null) {
+                    fullPath = dte.ActiveDocument.FullName;
+                    //var tempCmd = sender as OleMenuCommand;
+                    //tempCmd.Text = fullPath;
+                    //tempCmd.AutomationName = fullPath;
+                }
+                // Set the status bar text and make its display static.
+                statusBar.SetText(fullPath);
+
+                // Freeze the status bar.
+                statusBar.FreezeOutput(1);
+
+                // Get the status bar text.
+                //string text;
+                //statusBar.GetText(out text);
+                //System.Windows.Forms.MessageBox.Show(text);
+
+                // Clear the status bar text.
+                //statusBar.FreezeOutput(0);
+                //statusBar.Clear();
+
             } catch (Exception exc) {
                 message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", exc.ToString());
                 // Show a message box to prove we were here
@@ -108,6 +185,9 @@ namespace SyncFolder {
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }
+
+
+
             //var temp = dte.ActiveDocument.FullName;
             //if(dte.ActiveDocument != null) {
             //    dte.Application.MainWindow.Caption = dte.ActiveDocument.FullName;
